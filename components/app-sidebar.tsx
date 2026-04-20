@@ -83,12 +83,12 @@ const navData = [
     icon: IconWallet,
     roles: ["user", "admin"],
   },
-  {
-    title: "Exchange Rate",
-    url: "/dashboard/exchange-rates",
-    icon: IconCreditCardPay,
-    roles: ["admin"],
-  },
+  // {
+  //   title: "Exchange Rate",
+  //   url: "/dashboard/exchange-rates",
+  //   icon: IconCreditCardPay,
+  //   roles: ["admin"],
+  // },
   {
     title: "Reports",
     url: "/dashboard/reports",
