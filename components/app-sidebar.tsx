@@ -72,6 +72,12 @@ const navData = [
     roles: ["user", "admin"],
   },
   {
+    title: "Batches",
+    url: "/dashboard/batches",
+    icon: IconPackages,
+    roles: ["user", "admin"],
+  },
+  {
     title: "Payment",
     url: "/dashboard/payment",
     icon: IconCreditCardPay,

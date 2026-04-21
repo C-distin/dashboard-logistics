@@ -648,61 +648,81 @@ function ShipmentForm({
         </div>
       </div>
 
-      {/* Client */}
+      {/* Client — Fixed to show Name instead of UUID */}
       <div className="space-y-2">
         <Label>Client</Label>
         <Controller
           control={control}
           name="clientId"
-          render={({ field }) => (
-            <Select value={field.value} onValueChange={field.onChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a client" />
-              </SelectTrigger>
-              <SelectContent>
-                {clients.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    <span className="font-medium">{c.name}</span>
-                    {c.phone && (
-                      <span className="ml-2 text-xs text-muted-foreground">
-                        {c.phone}
-                      </span>
-                    )}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
+          render={({ field }) => {
+            const selectedClient = clients.find((c) => c.id === field.value);
+            return (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger>
+                  {selectedClient ? (
+                    <span>{selectedClient.name}</span>
+                  ) : (
+                    <SelectValue placeholder="Select a client" />
+                  )}
+                </SelectTrigger>
+                <SelectContent>
+                  {clients.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      <span className="font-medium">{c.name}</span>
+                      {c.phone && (
+                        <span className="ml-2 text-xs text-muted-foreground">
+                          {c.phone}
+                        </span>
+                      )}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            );
+          }}
         />
         {errors.clientId && (
           <p className="text-sm text-destructive">{errors.clientId.message}</p>
         )}
       </div>
 
-      {/* Price Rate */}
+      {/* Price Rate — Fixed to show Name instead of UUID */}
       <div className="space-y-2">
         <Label>Price Rate</Label>
         <Controller
           control={control}
           name="priceRateId"
-          render={({ field }) => (
-            <Select value={field.value} onValueChange={field.onChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a rate" />
-              </SelectTrigger>
-              <SelectContent>
-                {priceRates.map((r) => (
-                  <SelectItem key={r.id} value={r.id}>
-                    <span className="font-medium">{r.name}</span>
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      ${parseFloat(r.pricePerKgUSD).toFixed(2)}/kg · $
-                      {parseFloat(r.pricePerCbmUSD).toFixed(2)}/cbm
+          render={({ field }) => {
+            const selectedRate = priceRates.find((r) => r.id === field.value);
+            return (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger>
+                  {selectedRate ? (
+                    <span className="truncate">
+                      {selectedRate.name}{" "}
+                      <span className="text-muted-foreground font-normal text-xs ml-1">
+                        (${parseFloat(selectedRate.pricePerKgUSD).toFixed(2)}
+                        /kg)
+                      </span>
                     </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
+                  ) : (
+                    <SelectValue placeholder="Select a rate" />
+                  )}
+                </SelectTrigger>
+                <SelectContent>
+                  {priceRates.map((r) => (
+                    <SelectItem key={r.id} value={r.id}>
+                      <span className="font-medium">{r.name}</span>
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        ${parseFloat(r.pricePerKgUSD).toFixed(2)}/kg · ${" "}
+                        {parseFloat(r.pricePerCbmUSD).toFixed(2)}/cbm
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            );
+          }}
         />
         {errors.priceRateId && (
           <p className="text-sm text-destructive">
