@@ -73,7 +73,7 @@ type ExchangeRate = Awaited<ReturnType<typeof getExchangeRates>>[number];
 
 const TYPE_FILTERS = ["ALL", "AIR", "SEA"] as const;
 
-// No .default() fields — all values explicit
+// Default values matching Zod schema requirements
 const DEFAULT_VALUES: PriceRateInput = {
   type: "AIR",
   name: "",
@@ -87,7 +87,7 @@ const DEFAULT_VALUES: PriceRateInput = {
   isActive: true,
 };
 
-// Shared trigger className to avoid repetition
+// Shared trigger className for buttons without asChild
 const triggerBase =
   "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
 
@@ -253,7 +253,7 @@ export function PriceRatesTable({
           </Button>
         </div>
 
-        {/* Create — no asChild */}
+        {/* Create Button */}
         <Dialog
           open={isCreateOpen}
           onOpenChange={(open) => {
@@ -379,7 +379,7 @@ export function PriceRatesTable({
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                      {/* Edit — no asChild, onClick sets state */}
+                      {/* Edit Button */}
                       <Dialog
                         open={editingRate?.id === rate.id}
                         onOpenChange={(open) => {
@@ -411,7 +411,7 @@ export function PriceRatesTable({
                         </DialogContent>
                       </Dialog>
 
-                      {/* Delete — no asChild, onClick sets state */}
+                      {/* Delete Button */}
                       <AlertDialog
                         open={deletingRate?.id === rate.id}
                         onOpenChange={(open) => {
@@ -577,35 +577,55 @@ function PriceRateForm({
         </div>
       </div>
 
-      {/* Exchange Rates */}
+      {/* Exchange Rates - FIXED */}
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2">
           <Label>GHS Exchange Rate</Label>
           <Controller
             control={control}
             name="exchangeRateGHSId"
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select GHS rate" />
-                </SelectTrigger>
-                <SelectContent>
-                  {ghsRates.length === 0 ? (
-                    <SelectItem value="_none" disabled>
-                      No active GHS rates
-                    </SelectItem>
-                  ) : (
-                    ghsRates.map((r) => (
-                      <SelectItem key={r.id} value={r.id}>
-                        {parseFloat(r.rate).toFixed(4)} GHS
-                        {r.effectiveFrom &&
-                          ` · ${format(new Date(r.effectiveFrom), "MMM d")}`}
+            render={({ field }) => {
+              // Find the selected object to display the rate instead of UUID
+              const selectedRate = ghsRates.find((r) => r.id === field.value);
+
+              return (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    {selectedRate ? (
+                      <span className="truncate">
+                        {parseFloat(selectedRate.rate).toFixed(4)} GHS
+                        {selectedRate.effectiveFrom && (
+                          <span className="text-muted-foreground ml-1">
+                            ·{" "}
+                            {format(
+                              new Date(selectedRate.effectiveFrom),
+                              "MMM d",
+                            )}
+                          </span>
+                        )}
+                      </span>
+                    ) : (
+                      <SelectValue placeholder="Select GHS rate" />
+                    )}
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ghsRates.length === 0 ? (
+                      <SelectItem value="_none" disabled>
+                        No active GHS rates
                       </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-            )}
+                    ) : (
+                      ghsRates.map((r) => (
+                        <SelectItem key={r.id} value={r.id}>
+                          {parseFloat(r.rate).toFixed(4)} GHS
+                          {r.effectiveFrom &&
+                            ` · ${format(new Date(r.effectiveFrom), "MMM d")}`}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              );
+            }}
           />
           {errors.exchangeRateGHSId && (
             <p className="text-sm text-destructive">
@@ -619,28 +639,48 @@ function PriceRateForm({
           <Controller
             control={control}
             name="exchangeRateRMBId"
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select RMB rate" />
-                </SelectTrigger>
-                <SelectContent>
-                  {rmbRates.length === 0 ? (
-                    <SelectItem value="_none" disabled>
-                      No active RMB rates
-                    </SelectItem>
-                  ) : (
-                    rmbRates.map((r) => (
-                      <SelectItem key={r.id} value={r.id}>
-                        {parseFloat(r.rate).toFixed(4)} RMB
-                        {r.effectiveFrom &&
-                          ` · ${format(new Date(r.effectiveFrom), "MMM d")}`}
+            render={({ field }) => {
+              // Find the selected object to display the rate instead of UUID
+              const selectedRate = rmbRates.find((r) => r.id === field.value);
+
+              return (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    {selectedRate ? (
+                      <span className="truncate">
+                        {parseFloat(selectedRate.rate).toFixed(4)} RMB
+                        {selectedRate.effectiveFrom && (
+                          <span className="text-muted-foreground ml-1">
+                            ·{" "}
+                            {format(
+                              new Date(selectedRate.effectiveFrom),
+                              "MMM d",
+                            )}
+                          </span>
+                        )}
+                      </span>
+                    ) : (
+                      <SelectValue placeholder="Select RMB rate" />
+                    )}
+                  </SelectTrigger>
+                  <SelectContent>
+                    {rmbRates.length === 0 ? (
+                      <SelectItem value="_none" disabled>
+                        No active RMB rates
                       </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-            )}
+                    ) : (
+                      rmbRates.map((r) => (
+                        <SelectItem key={r.id} value={r.id}>
+                          {parseFloat(r.rate).toFixed(4)} RMB
+                          {r.effectiveFrom &&
+                            ` · ${format(new Date(r.effectiveFrom), "MMM d")}`}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              );
+            }}
           />
           {errors.exchangeRateRMBId && (
             <p className="text-sm text-destructive">
